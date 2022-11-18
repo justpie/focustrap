@@ -23,5 +23,6 @@
   "bugs": {
     "url": "https://github.com/justpie/focustrap/issues"
   },
-  "homepage": "https://github.com/justpie/focustrap#readme"
+  "homepage": "https://github.com/justpie/focustrap#readme",
+  "files": ["dist/**/*"]
 }
