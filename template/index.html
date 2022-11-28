@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>FocusTrap</title>
+        <style>
+            section {
+                border:1px solid rgb(119, 119, 119);
+                padding:1em;
+            }
+            section.controls dl {
+                display: flex;
+            }
+            #trap {
+                border:0;
+                margin:0;
+            }
+            #trap li {
+                padding:1em;
+                border:1px solid #f1f1f1;
+                border-bottom:none;
+            }
+            #trap li:last-child {
+                border:1px solid #f1f1f1;
+            }
+            #trap *:focus {
+                border-bottom:2px solid red;
+                outline:none;
+                box-sizing: border-box;
+
+            }
+        </style>
+    </head>
+    <body>
+        <h1>FocusTrap</h1>
+        <p>This is a simple script used to trap a users focus within a specific HTMLElement.</p>
+        
+        <section>
+            <ol id="trap">
+                <li><a>No Focus</a></li>
+                <li><a href="">Focus</a></li>
+                <li><a href="#test">Focus Inline Anchor</a></li>
+                <li><a href="https://google.com">Focus Anchor</a></li>
+                <li><input type="text" /> Focus Input</li>
+                <li><input type="text" /> Focus Input</li>
+                <li><input type="text" disabled/> Input Disabled: No Focus</li>
+                <li><button>Button: Focus</button></li>
+                <li><button disabled>Button: No Focus</button></li>
+                <li><a href="">Focus</a></li>
+            </ol>
+        </section>
+
+        <h2>Controls</h2>
+        <section id="controls">
+            <dl>
+                <dt><button id="disable">Disable</button></dt>
+                <dd>Enable/Disable FocusTrap</dd>
+                <dt><button id="disableOnEsc">Disable</button></dt>
+                <dd>Disable FocusTrap by pressing "Escape"</dd>
+                <dt><button id="focusOnEnable">Disable</button></dt>
+                <dd>When enabled, autofocus to first element</dd>
+                <dt><button id="disableLoop">Enable</button></dt>
+                <dd>When pressing tab, loop focus to beginning of focustrap</dd>
+            </dl>
+        </section>        
+    </body>
+</html>

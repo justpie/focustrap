@@ -1,9 +1,21 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: {
+    index: './src/index.ts',
+    demo: {
+      dependOn: 'index',
+      import: './src/demo.ts'
+    }
+  },
   mode: 'production',
-  devtool: 'inline-source-map',
+  plugins: [
+    new HtmlWebpackPlugin({
+        template: 'template/index.html',
+    }),
+  ],
   module: {
     rules: [
       {
@@ -17,7 +29,7 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: 'index.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
     globalObject: 'this',

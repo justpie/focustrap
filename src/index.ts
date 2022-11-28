@@ -5,6 +5,7 @@ const defaultOptions: DefaultOptions = {
     disableOnEsc: true,
     focusOnEnable: true,
     blurOnDisable: false,
+    disableLoop: false,
     tabble: [
         'a[href]:not([style*="visibility:hidden"])',
         'input:not([disabled]):not([style*="visibility:hidden"])',
@@ -17,8 +18,8 @@ const defaultOptions: DefaultOptions = {
 };
 
 export class FocusTrap {
-    element: HTMLElement;
-    options: DefaultOptions;
+    private element: HTMLElement;
+    public options: DefaultOptions;
 
     eventHandlerKeydown: ($event: KeyboardEvent) => void = ($event: KeyboardEvent) => this.bindKeyDown($event);
     eventHandlerFocusIn: ($event: FocusEvent) => void = ($event: FocusEvent) => this.bindFocusIn($event);
@@ -31,6 +32,8 @@ export class FocusTrap {
      *
      */
     public constructor(element: HTMLElement, options: object = {}) {
+        if(!element) throw new Error('HTMLElement must be provided');
+
         this.element = element;
         this.options = {
             ...defaultOptions,
@@ -48,6 +51,7 @@ export class FocusTrap {
         this.options.active = true;
         this.addListener();
         if (this.options.focusOnEnable === true) {
+            console.log('focusfirst');
             this.focusFirst();
         }
     }
@@ -64,9 +68,11 @@ export class FocusTrap {
     /**
      * Focus on the first element returned by getTabble()
      */
-    private focusFirst(): void {
+    public focusFirst(): void {
         const tabble = this.getTabble();
-        if (tabble) tabble[0].focus();
+        if (tabble.length) {
+            tabble[0].focus();
+        }
     }
 
     /**
@@ -121,10 +127,10 @@ export class FocusTrap {
      * Get all tabble children of the focustrap element
      * @return Array of HTML Elements
      */
-    private getTabble(): HTMLElement[] {
-        const element: NodeListOf<HTMLElement> = this.element.querySelectorAll<HTMLElement>(
-            this.options.tabble.join(",")
-        );
+    private getTabble(): HTMLElement[]|[] {
+        const tabs:string = this.options.tabble.join(",");
+        if(!tabs) return [];
+        const element: NodeListOf<HTMLElement> = this.element.querySelectorAll<HTMLElement>(tabs);
         return Array.from(element).filter(
             (e: HTMLElement) => !e.hidden && e.offsetWidth > 0 && e.offsetHeight > 0 && e.offsetParent !== null
         );
@@ -163,7 +169,13 @@ export class FocusTrap {
     private moveFocus(e: KeyboardEvent, direction: number): void {
         const children = this.getTabble();
         const index = children.findIndex((el: HTMLElement) => el === e.target);
+        if(index === -1) return;
+
         let moveTo = index + direction;
+
+        if((moveTo < 0 || moveTo > children.length-1) && this.options.disableLoop) {
+            return 
+        }
 
         if (moveTo > children.length - 1) moveTo = 0;
         if (moveTo < 0) {
