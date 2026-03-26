@@ -4,5 +4,8 @@ export interface DefaultOptions {
     focusOnEnable: boolean;
     blurOnDisable: boolean;
     disableLoop: boolean;
-    tabble: string[];
+    onEnable?: () => void;
+    onDisable?: () => void;
+    onFocus?: () => void;
+    onMove?: (e: KeyboardEvent, direction: number) => void;
 }

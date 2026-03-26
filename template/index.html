@@ -1,67 +1,237 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <title>FocusTrap</title>
-        <style>
-            section {
-                border:1px solid rgb(119, 119, 119);
-                padding:1em;
-            }
-            section.controls dl {
-                display: flex;
-            }
-            #trap {
-                border:0;
-                margin:0;
-            }
-            #trap li {
-                padding:1em;
-                border:1px solid #f1f1f1;
-                border-bottom:none;
-            }
-            #trap li:last-child {
-                border:1px solid #f1f1f1;
-            }
-            #trap *:focus {
-                border-bottom:2px solid red;
-                outline:none;
-                box-sizing: border-box;
+<head>
+    <meta charset="utf-8" />
+    <title>FocusTrap</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2em;
+        }
 
-            }
-        </style>
-    </head>
-    <body>
-        <h1>FocusTrap</h1>
-        <p>This is a simple script used to trap a users focus within a specific HTMLElement.</p>
-        
-        <section>
-            <ol id="trap">
-                <li><a>No Focus</a></li>
-                <li><a href="">Focus</a></li>
-                <li><a href="#test">Focus Inline Anchor</a></li>
-                <li><a href="https://google.com">Focus Anchor</a></li>
-                <li><input type="text" /> Focus Input</li>
-                <li><input type="text" /> Focus Input</li>
-                <li><input type="text" disabled/> Input Disabled: No Focus</li>
-                <li><button>Button: Focus</button></li>
-                <li><button disabled>Button: No Focus</button></li>
-                <li><a href="">Focus</a></li>
-            </ol>
-        </section>
+        section {
+            border: 1px solid rgb(119, 119, 119);
+            padding: 1em;a
+        margin-bottom: 1em;
+        }
 
-        <h2>Controls</h2>
-        <section id="controls">
-            <dl>
-                <dt><button id="disable">Disable</button></dt>
-                <dd>Enable/Disable FocusTrap</dd>
-                <dt><button id="disableOnEsc">Disable</button></dt>
-                <dd>Disable FocusTrap by pressing "Escape"</dd>
-                <dt><button id="focusOnEnable">Disable</button></dt>
-                <dd>When enabled, autofocus to first element</dd>
-                <dt><button id="disableLoop">Enable</button></dt>
-                <dd>When pressing tab, loop focus to beginning of focustrap</dd>
-            </dl>
-        </section>        
-    </body>
+        section.controls dl {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1em;
+            margin: 0;
+        }
+
+        section.controls dt {
+            margin-bottom: 0.25em;
+        }
+
+        section.controls dd {
+            margin: 0 0 0.5em 0;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        #trap, #trap2 {
+            border: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        #trap li, #trap2 li {
+            padding: 1em;
+            border: 1px solid #f1f1f1;
+            border-bottom: none;
+            list-style: none;
+        }
+
+        #trap li:last-child, #trap2 li:last-child {
+            border: 1px solid #f1f1f1;
+        }
+
+        #trap *:focus, #trap2 *:focus {
+            border-bottom: 2px solid red;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        /* ── status indicator ── */
+        #status {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            margin-bottom: 0.75em;
+            font-size: 0.85em;
+        }
+
+        #status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+
+        #status-indicator.active   { background: #2ecc71; }
+        #status-indicator.inactive { background: #e74c3c; }
+
+        /* ── trap2 separator ── */
+        .trap-label {
+            font-size: 0.75em;
+            color: #888;
+            margin: 0.5em 0 0.25em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── event log ── */
+        #event-log {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.8em;
+            font-family: monospace;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        #event-log li {
+            padding: 0.2em 0;
+            border-bottom: 1px solid #f5f5f5;
+            color: #444;
+        }
+
+        #event-log .log-empty {
+            color: #aaa;
+            font-style: italic;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5em;
+        }
+
+        .log-header h3 {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        .log-header button {
+            font-size: 0.75em;
+            padding: 2px 8px;
+        }
+
+        /* ── external trap demo ── */
+        #external-trap {
+            border: 1px dashed #aaa;
+            padding: 1em;
+            margin-top: 0.75em;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+        }
+
+        #external-trap *:focus {
+            outline: 2px solid red;
+            outline-offset: 2px;
+        }
+
+        #external-trap p {
+            font-size: 0.85em;
+            color: #555;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<h1>FocusTrap</h1>
+<p>This is a simple script used to trap a user's focus within a specific HTMLElement.</p>
+
+<!-- STATUS -->
+<div id="status">
+    <span id="status-indicator" class="active"></span>
+    <span id="status-text">Active</span>
+</div>
+
+<!-- TRAP ELEMENTS -->
+<section>
+    <p class="trap-label">trap #1 — #trap</p>
+    <ol id="trap">
+        <li><a>No Focus</a></li>
+        <li><a href="">Focus</a></li>
+        <li><a href="#test">Focus Inline Anchor</a></li>
+        <li><a href="https://google.com">Focus Anchor</a></li>
+        <li><input type="text" /> Focus Input</li>
+        <li><input type="text" /> Focus Input</li>
+        <li><input type="text" disabled /> Input Disabled: No Focus</li>
+        <li><button>Button: Focus</button></li>
+        <li><button disabled>Button: No Focus</button></li>
+        <li><a href="">Focus</a></li>
+    </ol>
+
+    <p class="trap-label">trap #2 — #trap2 (chained via multi-element constructor)</p>
+    <ol id="trap2">
+        <li><a href="">Focus</a></li>
+        <li><a href="#test">Focus Inline Anchor</a></li>
+    </ol>
+</section>
+
+<!-- CONTROLS -->
+<h2>Controls</h2>
+<section id="controls" class="controls">
+    <dl>
+        <div>
+            <dt><button id="disable">Disable</button></dt>
+            <dd>Enable / Disable FocusTrap</dd>
+        </div>
+        <div>
+            <dt><button id="disableOnEsc">Disable</button></dt>
+            <dd>Disable FocusTrap by pressing "Escape"</dd>
+        </div>
+        <div>
+            <dt><button id="focusOnEnable">Disable</button></dt>
+            <dd>When enabled, autofocus to first element</dd>
+        </div>
+        <div>
+            <dt><button id="blurOnDisable">Enable</button></dt>
+            <dd>Blur active element on disable</dd>
+        </div>
+        <div>
+            <dt><button id="disableLoop">Enable</button></dt>
+            <dd>Stop at last element instead of looping</dd>
+        </div>
+    </dl>
+</section>
+
+<!-- EVENT LOG -->
+<h2>Event Log</h2>
+<section>
+    <div class="log-header">
+        <h3>Callbacks</h3>
+        <button id="log-clear">Clear</button>
+    </div>
+    <ul id="event-log">
+        <li class="log-empty">No events yet</li>
+    </ul>
+</section>
+
+<!-- EXTERNAL ELEMENT DEMO -->
+<h2>onDisable — Return Focus to External Element</h2>
+<section>
+    <p>When <code>disableLoop: true</code> and the trap is disabled, <code>onDisable</code> returns focus to the button that opened the trap.</p>
+    <button id="external-btn">Enable trap (then Tab to end)</button>
+    <div id="external-trap">
+        <p>Focus is trapped here. Tab through to the end — loop is disabled, so it will stop.</p>
+        <input type="text" placeholder="Input 1" />
+        <input type="text" placeholder="Input 2" />
+        <button>Button</button>
+    </div>
+</section>
+
+<script src="index.js"></script>
+<script src="demo.js"></script>
+</body>
 </html>

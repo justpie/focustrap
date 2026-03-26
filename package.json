@@ -42,5 +42,8 @@
   "homepage": "https://github.com/justpie/focustrap#readme",
   "files": [
     "dist/**/*"
-  ]
+  ],
+  "dependencies": {
+    "tabbable": "^6.4.0"
+  }
 }
