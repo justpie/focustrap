@@ -1,4 +1,4 @@
-import { tabbable } from "tabbable";
+import { tabbable, isTabbable } from "tabbable";
 import { DefaultOptions } from "./interfaces";
 
 const defaultOptions: DefaultOptions = {
@@ -89,13 +89,16 @@ export class FocusTrap {
     }
 
     /**
-     * Get all tabbable children across all elements, in the order elements were provided
+     * Get all tabbable children across all elements, in the order elements were provided.
+     * If the element itself is tabbable (e.g. a button passed directly), it is included.
      * @return Array of HTML Elements
      */
     public getTabble(): HTMLElement[] {
-        return this.elements.flatMap((el) => tabbable(el) as HTMLElement[]);
+        return this.elements.flatMap((el) => {
+            const children = tabbable(el) as HTMLElement[];
+            return isTabbable(el) ? [el, ...children] : children;
+        });
     }
-
     /**
      * Listen to keydown events
      */

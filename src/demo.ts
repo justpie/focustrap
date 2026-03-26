@@ -2,6 +2,7 @@ import { FocusTrap } from "./index";
 
 const trapEl = document.getElementById("trap") as HTMLElement;
 const trapEl2 = document.getElementById("trap2") as HTMLElement;
+const trapEl3 = document.getElementById("trap3") as HTMLElement;
 const disableBtn = document.getElementById("disable") as HTMLElement;
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -39,7 +40,7 @@ function appendLog(msg: string) {
 
 // ── focus trap ────────────────────────────────────────────────────────────────
 
-const focus = new FocusTrap([trapEl, trapEl2], {
+const focus = new FocusTrap([trapEl, trapEl2, trapEl3], {
     onEnable: () => {
         updateStatus(true);
         disableBtn.innerText = "Disable";
