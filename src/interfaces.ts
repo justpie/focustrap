@@ -7,5 +7,6 @@ export interface DefaultOptions {
     onEnable?: () => void;
     onDisable?: () => void;
     onFocus?: () => void;
-    onMove?: (e: KeyboardEvent, direction: number) => void;
+    onFocusOut?: (e: FocusEvent) => void;
+    onMove?: (e: HTMLElement, direction: number) => void;
 }

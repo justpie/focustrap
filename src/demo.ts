@@ -4,6 +4,8 @@ const trapEl = document.getElementById("trap") as HTMLElement;
 const trapEl2 = document.getElementById("trap2") as HTMLElement;
 const trapEl3 = document.getElementById("trap3") as HTMLElement;
 const disableBtn = document.getElementById("disable") as HTMLElement;
+const iframe = document.getElementById("0zovrwKd2R0") as HTMLElement;
+
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -40,7 +42,7 @@ function appendLog(msg: string) {
 
 // ── focus trap ────────────────────────────────────────────────────────────────
 
-const focus = new FocusTrap([trapEl, trapEl2, trapEl3], {
+const focus = new FocusTrap([trapEl, trapEl2, trapEl3, iframe], {
     onEnable: () => {
         updateStatus(true);
         disableBtn.innerText = "Disable";
@@ -49,10 +51,19 @@ const focus = new FocusTrap([trapEl, trapEl2, trapEl3], {
         updateStatus(false);
         disableBtn.innerText = "Enable";
     },
-    onMove: (e: KeyboardEvent, direction: number) => {
+    onMove: (e: HTMLElement, direction: number): void => {
         const dir = direction === 1 ? "→" : "←";
-        const tag = (e.target as HTMLElement).tagName.toLowerCase();
+        const tag = (e as HTMLElement).tagName.toLowerCase();
         appendLog(`move ${dir} from <${tag}>`);
+    },
+    onFocusOut: (e: FocusEvent): void => {
+        if (!focus.tabbing) return;
+        const tabble = focus.getTabble();
+        let index = tabble.findIndex((el) => el === e.relatedTarget);
+        if (index === -1) {
+            index = tabble.findIndex((el) => el === focus.previousElement);
+            if (index) focus.moveFocus(focus.previousElement as HTMLElement, focus.direction, index + 1);
+        }
     },
 });
 

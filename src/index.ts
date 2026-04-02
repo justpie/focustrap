@@ -12,9 +12,13 @@ const defaultOptions: DefaultOptions = {
 export class FocusTrap {
     private elements: HTMLElement[];
     public options: DefaultOptions;
+    public tabbing: boolean = false;
+    public direction: number = 0;
+    public previousElement?: HTMLElement;
 
     eventHandlerKeydown: ($event: KeyboardEvent) => void = ($event: KeyboardEvent) => this.bindKeyDown($event);
     eventHandlerFocusIn: ($event: FocusEvent) => void = ($event: FocusEvent) => this.bindFocusIn($event);
+    eventHandlerFocusOut: ($event: FocusEvent) => void = ($event: FocusEvent) => this.bindFocusOut($event);
 
     /**
      * Constructor
@@ -37,7 +41,10 @@ export class FocusTrap {
             ...options,
         };
 
-        this.elements.forEach((el) => el.addEventListener("focusin", this.eventHandlerFocusIn));
+        this.elements.forEach((el) => {
+            el.addEventListener("focusin", this.eventHandlerFocusIn);
+            el.addEventListener("focusout", this.eventHandlerFocusOut);
+        });
         if (this.options.active === true) this.enable();
     }
 
@@ -105,10 +112,10 @@ export class FocusTrap {
     private bindKeyDown(e: KeyboardEvent): void {
         if (this.isEsc(e) && this.options.disableOnEsc === true) return this.disable();
 
-        const direction = this.isTab(e);
-        if (direction !== 0) {
+        this.direction = this.isTab(e);
+        if (this.direction !== 0) {
             e.preventDefault();
-            this.moveFocus(e, direction);
+            this.moveFocus(e.target as HTMLElement, this.direction);
         }
     }
 
@@ -125,23 +132,41 @@ export class FocusTrap {
     }
 
     /**
+     * Fire if focus leaves our elements
+     */
+    private bindFocusOut(e: FocusEvent): void {
+
+        this.options.onFocusOut?.(e);
+        this.tabbing = false;
+    }
+
+    /**
      * Move focus to next or previous element in our tabbable list
      * @param e - Keyboard event
      * @param direction - "-1" for backwards "1" for forwards
      */
-    private moveFocus(e: KeyboardEvent, direction: number): void {
+    public moveFocus(element: HTMLElement, direction: number, jumpTo: number | null = null): void {
         const children = this.getTabble();
-        const index = children.findIndex((el: HTMLElement) => el === e.target);
-        if (index === -1) return;
+        let index: number = 0;
+        let moveTo: number = 0;
 
-        const moveTo = index + direction;
+        if (jumpTo && children[jumpTo]) {
+            index = jumpTo;
+            moveTo = index;
+        } else {
+            index = children.findIndex((el: HTMLElement) => el === element);
+            moveTo = index + direction;
+        }
+
+        if (index === -1) return;
 
         if ((moveTo < 0 || moveTo > children.length - 1) && this.options.disableLoop) return;
 
         const next = ((moveTo % children.length) + children.length) % children.length;
         children[next].focus();
-
-        this.options.onMove?.(e, direction);
+        this.previousElement = children[next];
+        this.options.onMove?.(element as HTMLElement, direction);
+        this.options.onFocus?.();
     }
 
     /**
@@ -162,6 +187,7 @@ export class FocusTrap {
     private isTab(key: KeyboardEvent): number {
         const isTab = this.isTabKey(key);
         if (!isTab) return 0;
+        this.tabbing = true;
         if (key.shiftKey === true) return -1;
         return 1;
     }
