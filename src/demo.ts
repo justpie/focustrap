@@ -6,7 +6,6 @@ const trapEl3 = document.getElementById("trap3") as HTMLElement;
 const disableBtn = document.getElementById("disable") as HTMLElement;
 const iframe = document.getElementById("0zovrwKd2R0") as HTMLElement;
 
-
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 const toggle = (target: HTMLElement, option: boolean) => {

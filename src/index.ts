@@ -135,7 +135,6 @@ export class FocusTrap {
      * Fire if focus leaves our elements
      */
     private bindFocusOut(e: FocusEvent): void {
-
         this.options.onFocusOut?.(e);
         this.tabbing = false;
     }
