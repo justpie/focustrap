@@ -1,7 +1,7 @@
 {
   "name": "@justpie/focustrap",
   "author": "@justpie",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Simple focustrap",
   "main": "./dist/index.js",
   "scripts": {
